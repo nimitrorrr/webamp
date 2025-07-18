@@ -1,13 +1,9 @@
 import * as React from "react";
 import classnames from "classnames";
 
-import * as Actions from "../../actionCreators";
 import * as Selectors from "../../selectors";
-import ResizeTarget from "../ResizeTarget";
 import { WindowId } from "../../types";
-import FocusTarget from "../FocusTarget";
-import { useActionCreator, useTypedSelector } from "../../hooks";
-import WinampButton from "../WinampButton";
+import { useTypedSelector } from "../../hooks";
 
 interface TextProps {
   children: string;
@@ -16,16 +12,16 @@ interface TextProps {
 const Text = ({ children }: TextProps) => {
   const letters = children.split("");
   return (
-    <React.Fragment>
+    <>
       {letters.map((letter, i) => (
         <div
           key={i}
-          className={`draggable gen-text-letter gen-text-${
+          className={`gen-text-letter gen-text-${
             letter === " " ? "space" : letter.toLowerCase()
           }`}
         />
       ))}
-    </React.Fragment>
+    </>
   );
 };
 
@@ -44,64 +40,45 @@ interface Props {
   onKeyDown?(e: KeyboardEvent): void;
 }
 
-// Named export for testing
-export const GenWindow = ({ children, title, windowId, onKeyDown }: Props) => {
-  const setWindowSize = useActionCreator(Actions.setWindowSize);
-  const closeWindow = useActionCreator(Actions.closeWindow);
+export const GenWindow = ({ children, title, windowId }: Props) => {
   const getWindowPixelSize = useTypedSelector(Selectors.getWindowPixelSize);
-  const focusedWindow = useTypedSelector(Selectors.getFocusedWindow);
-  const getWindowSize = useTypedSelector(Selectors.getWindowSize);
-  const windowSize = getWindowSize(windowId);
-  const selected = focusedWindow === windowId;
   const { width, height } = getWindowPixelSize(windowId);
+
   return (
-    <FocusTarget windowId={windowId} onKeyDown={onKeyDown}>
-      <div
-        className={classnames("gen-window", "window", { selected })}
-        style={{ width, height }}
-      >
-        <div className="gen-top draggable">
-          <div className="gen-top-left draggable" />
-          <div className="gen-top-left-fill draggable" />
-          <div className="gen-top-left-end draggable" />
-          <div className="gen-top-title draggable">
-            <Text>{title}</Text>
-          </div>
-          <div className="gen-top-right-end draggable" />
-          <div className="gen-top-right-fill draggable" />
-          <div className="gen-top-right draggable">
-            <WinampButton
-              className="gen-close selected"
-              onClick={() => closeWindow(windowId)}
-            />
-          </div>
+    <div
+      className={classnames("gen-window", "window")}
+      style={{ width, height, position: "relative" }}
+    >
+      <div className="gen-top">
+        <div className="gen-top-left" />
+        <div className="gen-top-left-fill" />
+        <div className="gen-top-left-end" />
+        <div className="gen-top-title">
+          <Text>{title}</Text>
         </div>
-        <div className="gen-middle">
-          <div className="gen-middle-left draggable">
-            <div className="gen-middle-left-bottom draggable" />
-          </div>
-          <div className="gen-middle-center">
-            {children({
-              width: width - CHROME_WIDTH,
-              height: height - CHROME_HEIGHT,
-            })}
-          </div>
-          <div className="gen-middle-right draggable">
-            <div className="gen-middle-right-bottom draggable" />
-          </div>
+        <div className="gen-top-right-end" />
+        <div className="gen-top-right-fill" />
+        <div className="gen-top-right" />
+      </div>
+      <div className="gen-middle">
+        <div className="gen-middle-left">
+          <div className="gen-middle-left-bottom" />
         </div>
-        <div className="gen-bottom draggable">
-          <div className="gen-bottom-left draggable" />
-          <div className="gen-bottom-right draggable">
-            <ResizeTarget
-              currentSize={windowSize}
-              setWindowSize={(size) => setWindowSize(windowId, size)}
-              id={"gen-resize-target"}
-            />
-          </div>
+        <div className="gen-middle-center">
+          {children({
+            width: width - CHROME_WIDTH,
+            height: height - CHROME_HEIGHT,
+          })}
+        </div>
+        <div className="gen-middle-right">
+          <div className="gen-middle-right-bottom" />
         </div>
       </div>
-    </FocusTarget>
+      <div className="gen-bottom">
+        <div className="gen-bottom-left" />
+        <div className="gen-bottom-right" />
+      </div>
+    </div>
   );
 };
 
