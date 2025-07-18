@@ -6,7 +6,6 @@ import * as Actions from "../../actionCreators";
 import * as Selectors from "../../selectors";
 
 import { clamp } from "../../utils";
-import DropTarget from "../DropTarget";
 import Vis from "../Vis";
 import PlaylistShade from "./PlaylistShade";
 import AddMenu from "./AddMenu";
@@ -22,7 +21,6 @@ import PlaylistScrollBar from "./PlaylistScrollBar";
 import { AppState } from "../../types";
 import FocusTarget from "../FocusTarget";
 import { useActionCreator, useTypedSelector } from "../../hooks";
-import WinampButton from "../WinampButton";
 
 interface Props {
   analyser: AnalyserNode;
@@ -81,61 +79,50 @@ function PlaylistWindow({ analyser }: Props) {
     color: skinPlaylistStyle.normal,
     backgroundColor: skinPlaylistStyle.normalbg,
     fontFamily: `${skinPlaylistStyle.font}, Arial, sans-serif`,
-    height: `${playlistWindowPixelSize.height}px`,
-    width: `${playlistWindowPixelSize.width}px`,
+    height: `100%`,  // растянуть на всю доступную высоту
+    width: `100%`,   // растянуть на всю ширину
   };
 
-  const classes = classnames("window", "draggable", { selected });
+  const classes = classnames("window", { selected });
 
   const showSpacers = playlistSize[0] % 2 === 0;
 
   return (
     <FocusTarget windowId={WINDOWS.PLAYLIST}>
-      <DropTarget
+      <div
         id="playlist-window"
-        windowId={WINDOWS.PLAYLIST}
         className={classes}
         style={style}
-        handleDrop={handleDrop}
-        onWheelActive={scrollPlaylistByDelta}
+        // убрал handleDrop и onWheelActive чтобы убрать drag'n'drop
       >
-        <div className="playlist-top draggable" onDoubleClick={toggleShade}>
-          <div className="playlist-top-left draggable" />
-          {showSpacers && (
-            <div className="playlist-top-left-spacer draggable" />
-          )}
-          <div className="playlist-top-left-fill draggable" />
-          <div className="playlist-top-title draggable" />
-          {showSpacers && (
-            <div className="playlist-top-right-spacer draggable" />
-          )}
-          <div className="playlist-top-right-fill draggable" />
-          <div className="playlist-top-right draggable">
-            <WinampButton id="playlist-shade-button" onClick={toggleShade} />
-            <WinampButton
-              id="playlist-close-button"
-              onClick={() => close(WINDOWS.PLAYLIST)}
-            />
+        <div className="playlist-top" onDoubleClick={toggleShade}>
+          <div className="playlist-top-left" />
+          {showSpacers && <div className="playlist-top-left-spacer" />}
+          <div className="playlist-top-left-fill" />
+          <div className="playlist-top-title" />
+          {showSpacers && <div className="playlist-top-right-spacer" />}
+          <div className="playlist-top-right">
+            {/* Убираю кнопки */}
           </div>
         </div>
-        <div className="playlist-middle draggable">
-          <div className="playlist-middle-left draggable" />
+        <div className="playlist-middle">
+          <div className="playlist-middle-left" />
           <div className="playlist-middle-center">
             <TrackList />
           </div>
-          <WinampButton className="playlist-middle-right draggable">
+          <div className="playlist-middle-right">
             <PlaylistScrollBar />
-          </WinampButton>
+          </div>
         </div>
-        <div className="playlist-bottom draggable">
-          <div className="playlist-bottom-left draggable">
+        <div className="playlist-bottom">
+          <div className="playlist-bottom-left">
             <AddMenu />
             <RemoveMenu />
             <SelectionMenu />
             <MiscMenu />
           </div>
-          <div className="playlist-bottom-center draggable" />
-          <div className="playlist-bottom-right draggable">
+          <div className="playlist-bottom-center" />
+          <div className="playlist-bottom-right">
             {showVisualizer && (
               <div className="playlist-visualizer">
                 {activateVisualizer && (
@@ -155,7 +142,7 @@ function PlaylistWindow({ analyser }: Props) {
             <PlaylistResizeTarget />
           </div>
         </div>
-      </DropTarget>
+      </div>
     </FocusTarget>
   );
 }
